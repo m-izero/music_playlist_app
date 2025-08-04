@@ -1,10 +1,57 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:music_playlist/PAGES/playlist.dart';
 import 'package:music_playlist/PAGES/profile.dart';
+import 'package:music_playlist/PAGES/settings.dart';
 import 'package:music_playlist/components/drawer.dart';
 
-class Screen1 extends StatelessWidget {
-  const Screen1({Key? key}) : super(key: key);
+class Screen1 extends StatefulWidget {
+  const Screen1({super.key});
+
+  @override
+  State<Screen1> createState() => _Screen1State();
+}
+
+class _Screen1State extends State<Screen1> {
+  int myIndex = 0;
+  static const List<Widget> widgetList = [
+    HomePage(),
+    Screen3(),
+    Screen4(),
+  ];
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: widgetList[myIndex],
+      bottomNavigationBar: BottomNavigationBar(
+        backgroundColor: Colors.blue[500],
+        items: const [
+          BottomNavigationBarItem(
+              icon: Icon(Icons.home),
+              label: 'Home',
+              backgroundColor: Colors.blue),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.playlist_add),
+              label: 'Playlist',
+              backgroundColor: Colors.blue),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.settings),
+              label: 'Settings',
+              backgroundColor: Colors.blue),
+        ],
+        currentIndex: myIndex,
+        selectedItemColor: Colors.black,
+        onTap: (int index) {
+          setState(() {
+            myIndex = index;
+          });
+        },
+      ),
+    );
+  }
+}
+
+class HomePage extends StatelessWidget {
+  const HomePage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -17,35 +64,15 @@ class Screen1 extends StatelessWidget {
         actions: [
           IconButton(
               onPressed: () {
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => ProfilePage()));
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const ProfilePage()));
               },
               icon: const Icon(Icons.person))
         ],
       ),
       drawer: const DrawerPage(),
-      body: ListView(),
-
-      /*Row(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Container(
-              height: 50,
-              width: 160,
-              color: Colors.black54,
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Container(
-              height: 50,
-              width: 160,
-              color: Colors.black54,
-            ),
-          ),
-        ],
-      ),*/
     );
   }
 }

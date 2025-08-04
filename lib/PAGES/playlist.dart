@@ -4,7 +4,7 @@ import 'package:music_playlist/PAGES/profile.dart';
 import 'package:music_playlist/components/drawer.dart';
 
 class Screen3 extends StatelessWidget {
-  const Screen3({Key? key}) : super(key: key);
+  const Screen3({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -23,6 +23,7 @@ class Screen3 extends StatelessWidget {
               icon: const Icon(Icons.person))
         ],
       ),
+      drawer: const DrawerPage(),
       body: const Center(child: Text("hello playlist")),
     );
   }

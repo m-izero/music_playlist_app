@@ -1,19 +1,17 @@
-import 'dart:ui';
-
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:music_playlist/PAGES/profile.dart';
-import 'package:music_playlist/components/drawer.dart';
+
+import '../components/drawer.dart';
 
 class Screen4 extends StatelessWidget {
-  const Screen4({Key? key}) : super(key: key);
+  const Screen4({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.blue[100],
       appBar: AppBar(
-        title: Text("settings"),
+        title: const Text("settings"),
         backgroundColor: Colors.blue[500],
         centerTitle: true,
         actions: [
@@ -25,6 +23,7 @@ class Screen4 extends StatelessWidget {
               icon: const Icon(Icons.person))
         ],
       ),
+      drawer: const DrawerPage(),
       body: Padding(
         padding: const EdgeInsets.all(10.0),
         child: Container(
