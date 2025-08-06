@@ -73,6 +73,11 @@ class HomePage extends StatelessWidget {
         ],
       ),
       drawer: const DrawerPage(),
+      body: ListView(
+        scrollDirection: Axis.vertical,
+        reverse: false,
+        children: [],
+      ),
     );
   }
 }

@@ -11,7 +11,7 @@ class DrawerPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Drawer(
       child: Container(
-        color: Colors.blue[1000],
+        color: Color(0xff266ba4),
         width: 200,
         child: ListView(
           children: [
