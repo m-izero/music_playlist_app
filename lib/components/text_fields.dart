@@ -1,13 +1,12 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-class my_TextField extends StatelessWidget {
-  final controller;
-  final hintText;
-  final displayText;
+class MyTextField extends StatelessWidget {
+  final TextEditingController controller;
+  final String hintText;
+  final bool displayText;
   final prefixIcon;
 
-  const my_TextField({
+  const MyTextField({
     super.key,
     required this.controller,
     required this.displayText,
@@ -24,7 +23,7 @@ class my_TextField extends StatelessWidget {
         obscureText: displayText,
         decoration: InputDecoration(
           labelText: hintText,
-          border: OutlineInputBorder(),
+          border: const OutlineInputBorder(),
           prefixIcon: prefixIcon,
         ),
       ),

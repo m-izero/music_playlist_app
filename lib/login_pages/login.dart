@@ -1,7 +1,3 @@
-import 'dart:html';
-import 'dart:ui';
-
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:music_playlist/components/text_fields.dart';
 
@@ -27,7 +23,7 @@ class LoginPage extends StatelessWidget {
                 padding: const EdgeInsets.all(15),
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(20),
-                  child: Container(
+                  child: SizedBox(
                       height: 100,
                       width: 100,
                       child: Image.asset(
@@ -47,20 +43,20 @@ class LoginPage extends StatelessWidget {
                 )),
             const SizedBox(height: 20),
             //inputs
-            my_TextField(
+            MyTextField(
               controller: userNameController,
               hintText: 'Email',
               displayText: false,
-              prefixIcon: Icon(Icons.email),
+              prefixIcon: const Icon(Icons.email),
             ),
 
             const SizedBox(height: 15),
 
-            my_TextField(
+            MyTextField(
               controller: passwordController,
               hintText: 'Password',
               displayText: true,
-              prefixIcon: Icon(Icons.lock),
+              prefixIcon: const Icon(Icons.lock),
             ),
             //forget message
             const Padding(
@@ -134,7 +130,7 @@ class LoginPage extends StatelessWidget {
               children: [
                 ClipRRect(
                   borderRadius: BorderRadius.circular(10),
-                  child: Container(
+                  child: SizedBox(
                     height: 50,
                     width: 50,
                     child: Image.asset(
@@ -146,7 +142,7 @@ class LoginPage extends StatelessWidget {
                 const SizedBox(width: 10),
                 ClipRRect(
                   borderRadius: BorderRadius.circular(10),
-                  child: Container(
+                  child: SizedBox(
                     height: 50,
                     width: 50,
                     child: Image.asset(
@@ -158,7 +154,7 @@ class LoginPage extends StatelessWidget {
                 const SizedBox(width: 10),
                 ClipRRect(
                   borderRadius: BorderRadius.circular(10),
-                  child: Container(
+                  child: SizedBox(
                     height: 50,
                     width: 50,
                     child: Image.asset(

@@ -3,6 +3,9 @@ import 'package:music_playlist/PAGES/playlist.dart';
 import 'package:music_playlist/PAGES/profile.dart';
 import 'package:music_playlist/PAGES/settings.dart';
 import 'package:music_playlist/components/drawer.dart';
+import 'package:provider/provider.dart';
+
+import '../providers/music_provider.dart';
 
 class Screen1 extends StatefulWidget {
   const Screen1({super.key});
@@ -15,7 +18,7 @@ class _Screen1State extends State<Screen1> {
   int myIndex = 0;
   static const List<Widget> widgetList = [
     HomePage(),
-    Screen3(),
+    PlaylistPage(),
     Screen4(),
   ];
   @override
@@ -50,11 +53,18 @@ class _Screen1State extends State<Screen1> {
   }
 }
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
   @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  @override
   Widget build(BuildContext context) {
+    // We don't need to listen here, just access the songs list and methods
+    final musicProvider = Provider.of<MusicProvider>(context, listen: false);
     return Scaffold(
       backgroundColor: Colors.blue[100],
       appBar: AppBar(
@@ -73,10 +83,21 @@ class HomePage extends StatelessWidget {
         ],
       ),
       drawer: const DrawerPage(),
-      body: ListView(
-        scrollDirection: Axis.vertical,
-        reverse: false,
-        children: [],
+      body: ListView.builder(
+        itemCount: musicProvider.songs.length,
+        itemBuilder: (context, index) {
+          final song = musicProvider.songs[index];
+          return ListTile(
+            leading: CircleAvatar(
+              backgroundImage: NetworkImage(song.albumArtUrl),
+            ),
+            title: Text(song.title),
+            subtitle: Text(song.artist),
+            onTap: () async {
+              await musicProvider.playSong(index);
+            },
+          );
+        },
       ),
     );
   }

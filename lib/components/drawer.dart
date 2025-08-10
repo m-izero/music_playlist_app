@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:music_playlist/PAGES/home.dart';
 import 'package:music_playlist/PAGES/playlist.dart';
@@ -11,78 +10,82 @@ class DrawerPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Drawer(
       child: Container(
-        color: Color(0xff266ba4),
+        color: const Color(0xff266ba4),
         width: 200,
         child: ListView(
           children: [
-            DrawerHeader(
+            const DrawerHeader(
               child: Center(),
             ),
             ListTile(
-              leading: Icon(
+              leading: const Icon(
                 Icons.home,
                 color: Colors.white,
               ),
-              title: Text('Home'),
+              title: const Text('Home'),
               textColor: Colors.white,
               onTap: () {
                 Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => Screen1()));
+                    MaterialPageRoute(builder: (context) => const Screen1()));
               },
             ),
             ListTile(
-              leading: Icon(
+              leading: const Icon(
                 Icons.search,
                 color: Colors.white,
               ),
-              title: Text('Search'),
+              title: const Text('Search'),
               textColor: Colors.white,
               onTap: () {
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => Screen3()));
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const PlaylistPage()));
               },
             ),
             ListTile(
-              leading: Icon(
+              leading: const Icon(
                 Icons.playlist_add,
                 color: Colors.white,
               ),
-              title: Text('Playlist'),
+              title: const Text('Playlist'),
               textColor: Colors.white,
               onTap: () {
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => Screen3()));
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const PlaylistPage()));
               },
             ),
             ListTile(
-              leading: Icon(
+              leading: const Icon(
                 Icons.settings,
                 color: Colors.white,
               ),
-              title: Text('settings'),
+              title: const Text('settings'),
               textColor: Colors.white,
               onTap: () {
                 Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => Screen4()));
+                    MaterialPageRoute(builder: (context) => const Screen4()));
               },
             ),
             ListTile(
-              leading: Icon(
+              leading: const Icon(
                 Icons.favorite,
                 color: Colors.white,
               ),
-              title: Text('favorites'),
+              title: const Text('favorites'),
               textColor: Colors.white,
               onTap: () {
                 Navigator.pop(context);
               },
             ),
             ListTile(
-              leading: Icon(
+              leading: const Icon(
                 Icons.upgrade,
                 color: Colors.white,
               ),
-              title: Text('upgrade'),
+              title: const Text('upgrade'),
               textColor: Colors.white,
               onTap: () {
                 Navigator.pop(context);

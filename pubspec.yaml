@@ -11,6 +11,14 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_native_splash: ^2.4.6
+  just_audio: ^0.9.36  # For playing audio
+  file_picker: ^10.2.4   # To select local files
+  provider: ^6.1.5
+  audioplayers: ^6.5.0
+  cached_network_image: ^3.4.1
+  audio_video_progress_bar: ^2.0.3
+  just_audio_background: ^0.0.1-beta.17
+  rxdart: ^0.28.0
 
 dev_dependencies:
   flutter_test:
