@@ -30,12 +30,9 @@ class _PlaylistPageState extends State<PlaylistPage> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     TextField(
-                      decoration: const InputDecoration(
-                        labelText: "Playlist Name",
-                      ),
-                      onChanged: (value) {
-                        playlistName = value;
-                      },
+                      decoration:
+                          const InputDecoration(labelText: "Playlist Name"),
+                      onChanged: (value) => playlistName = value,
                     ),
                     const SizedBox(height: 20),
                     ElevatedButton(
@@ -43,16 +40,9 @@ class _PlaylistPageState extends State<PlaylistPage> {
                         FilePickerResult? result =
                             await FilePicker.platform.pickFiles(
                           type: FileType.custom,
-                          allowedExtensions: [
-                            'mp3',
-                            'wav',
-                            'aac',
-                            'm4a',
-                            'mp4'
-                          ],
+                          allowedExtensions: ['mp3', 'wav', 'aac', 'm4a'],
                           allowMultiple: true,
                         );
-
                         if (result != null) {
                           songs = result.paths
                               .where((path) => path != null)
@@ -81,17 +71,13 @@ class _PlaylistPageState extends State<PlaylistPage> {
               ),
               actions: [
                 TextButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: const Text("Cancel"),
-                ),
+                    onPressed: () => Navigator.pop(context),
+                    child: const Text("Cancel")),
                 ElevatedButton(
                   onPressed: () {
                     if (playlistName.trim().isNotEmpty && songs.isNotEmpty) {
                       setState(() {
-                        playlists.add({
-                          "name": playlistName,
-                          "songs": songs,
-                        });
+                        playlists.add({"name": playlistName, "songs": songs});
                       });
                       Navigator.pop(context);
                     }
@@ -193,11 +179,8 @@ class PlaylistSongsPage extends StatefulWidget {
   final String playlistName;
   final List<Map<String, String>> songs;
 
-  const PlaylistSongsPage({
-    super.key,
-    required this.playlistName,
-    required this.songs,
-  });
+  const PlaylistSongsPage(
+      {super.key, required this.playlistName, required this.songs});
 
   @override
   State<PlaylistSongsPage> createState() => _PlaylistSongsPageState();
@@ -205,20 +188,61 @@ class PlaylistSongsPage extends StatefulWidget {
 
 class _PlaylistSongsPageState extends State<PlaylistSongsPage> {
   final AudioPlayer _player = AudioPlayer();
-  String? _currentlyPlaying;
+  int _currentIndex = -1;
   bool _isPlaying = false;
+  Duration _currentPosition = Duration.zero;
+  Duration _totalDuration = Duration.zero;
 
-  void _playSong(String path) async {
-    if (_currentlyPlaying == path && _isPlaying) {
-      await _player.pause();
-      setState(() => _isPlaying = false);
-    } else {
-      await _player.play(DeviceFileSource(path));
-      setState(() {
-        _currentlyPlaying = path;
-        _isPlaying = true;
-      });
+  @override
+  void initState() {
+    super.initState();
+
+    _player.onDurationChanged.listen((d) {
+      setState(() => _totalDuration = d);
+    });
+
+    _player.onPositionChanged.listen((p) {
+      setState(() => _currentPosition = p);
+    });
+
+    _player.onPlayerComplete.listen((event) {
+      _nextSong();
+    });
+  }
+
+  void _playSong(int index) async {
+    String path = widget.songs[index]["path"]!;
+    await _player.play(DeviceFileSource(path));
+    setState(() {
+      _currentIndex = index;
+      _isPlaying = true;
+    });
+  }
+
+  void _pauseSong() async {
+    await _player.pause();
+    setState(() => _isPlaying = false);
+  }
+
+  void _resumeSong() async {
+    await _player.resume();
+    setState(() => _isPlaying = true);
+  }
+
+  void _nextSong() {
+    if (_currentIndex + 1 < widget.songs.length) {
+      _playSong(_currentIndex + 1);
     }
+  }
+
+  void _previousSong() {
+    if (_currentIndex > 0) {
+      _playSong(_currentIndex - 1);
+    }
+  }
+
+  void _seekSong(double seconds) {
+    _player.seek(Duration(seconds: seconds.toInt()));
   }
 
   @override
@@ -230,25 +254,72 @@ class _PlaylistSongsPageState extends State<PlaylistSongsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.playlistName),
-      ),
-      body: ListView.builder(
-        itemCount: widget.songs.length,
-        itemBuilder: (context, index) {
-          String songName = widget.songs[index]["name"]!;
-          String songPath = widget.songs[index]["path"]!;
-          bool isCurrent = _currentlyPlaying == songPath;
-
-          return ListTile(
-            leading: Icon(
-              isCurrent && _isPlaying ? Icons.pause_circle : Icons.play_circle,
-              color: Colors.blue,
+      appBar: AppBar(title: Text(widget.playlistName)),
+      body: Column(
+        children: [
+          Expanded(
+            child: ListView.builder(
+              itemCount: widget.songs.length,
+              itemBuilder: (context, index) {
+                bool isCurrent = _currentIndex == index;
+                return ListTile(
+                  leading: Icon(
+                    isCurrent && _isPlaying
+                        ? Icons.pause_circle
+                        : Icons.play_circle,
+                    color: Colors.blue,
+                  ),
+                  title: Text(widget.songs[index]["name"]!),
+                  onTap: () {
+                    if (isCurrent) {
+                      _isPlaying ? _pauseSong() : _resumeSong();
+                    } else {
+                      _playSong(index);
+                    }
+                  },
+                );
+              },
             ),
-            title: Text(songName),
-            onTap: () => _playSong(songPath),
-          );
-        },
+          ),
+          if (_currentIndex != -1) _buildMiniPlayer(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMiniPlayer() {
+    return Container(
+      color: Colors.grey[200],
+      padding: const EdgeInsets.all(10),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            widget.songs[_currentIndex]["name"]!,
+            style: const TextStyle(fontWeight: FontWeight.bold),
+          ),
+          Slider(
+            value: _currentPosition.inSeconds.toDouble(),
+            max: _totalDuration.inSeconds.toDouble(),
+            onChanged: (value) => _seekSong(value),
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              IconButton(
+                  icon: const Icon(Icons.skip_previous),
+                  onPressed: _previousSong),
+              IconButton(
+                icon: Icon(_isPlaying ? Icons.pause : Icons.play_arrow),
+                onPressed: () {
+                  _isPlaying ? _pauseSong() : _resumeSong();
+                },
+              ),
+              IconButton(
+                  icon: const Icon(Icons.skip_next), onPressed: _nextSong),
+            ],
+          ),
+        ],
       ),
     );
   }
