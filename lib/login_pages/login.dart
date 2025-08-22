@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:music_playlist/components/text_fields.dart';
+import 'package:music_playlist/login_pages/signup_page.dart';
+import 'package:provider/provider.dart';
 
 import '../PAGES/home.dart';
+import '../providers/user_provider.dart';
 
 class LoginPage extends StatelessWidget {
   final Function()? onTap;
@@ -79,22 +82,36 @@ class LoginPage extends StatelessWidget {
             //button
 
             GestureDetector(
-              onTap: () => Navigator.pushReplacement(context,
-                  MaterialPageRoute(builder: (context) => const Screen1())),
+              onTap: () {
+                final username = userNameController.text;
+                final password = userNameController.text;
+
+                // Save to provider
+                Provider.of<UserProvider>(context, listen: false)
+                    .login(username, password);
+
+                // Navigate to the next screen
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => const Screen1()),
+                );
+              },
               child: Container(
                 height: 50,
                 width: 320,
                 decoration: BoxDecoration(
-                    color: Colors.blue[200],
-                    borderRadius: BorderRadius.circular(10)),
+                  color: Colors.blue[200],
+                  borderRadius: BorderRadius.circular(10),
+                ),
                 child: const Center(
-                    child: Text(
-                  'Login',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
+                  child: Text(
+                    'Login',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                )),
+                ),
               ),
             ),
 
@@ -168,10 +185,11 @@ class LoginPage extends StatelessWidget {
             const SizedBox(height: 12),
 
             //signup option
-            const Row(
+            //signup option
+            Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text(
+                const Text(
                   'Do not have an account?',
                   style: TextStyle(
                     fontSize: 15,
@@ -179,13 +197,21 @@ class LoginPage extends StatelessWidget {
                     color: Colors.black54,
                   ),
                 ),
-                SizedBox(width: 8),
-                Text(
-                  'Sign Up',
-                  style: TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.blue,
+                const SizedBox(width: 8),
+                GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => SignUpPage()),
+                    );
+                  },
+                  child: const Text(
+                    'Sign Up',
+                    style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.blue,
+                    ),
                   ),
                 ),
               ],
