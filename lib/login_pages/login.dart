@@ -17,7 +17,7 @@ class LoginPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.blue[100],
-      body: Expanded(
+      body: SingleChildScrollView(
         child: Column(
           children: [
             const SizedBox(height: 28),

@@ -6,6 +6,7 @@ import 'package:music_playlist/components/drawer.dart';
 import 'package:provider/provider.dart';
 
 import '../providers/music_provider.dart';
+import 'music_player_screen.dart';
 
 class Screen1 extends StatefulWidget {
   const Screen1({super.key});
@@ -53,48 +54,107 @@ class _Screen1State extends State<Screen1> {
   }
 }
 
-class HomePage extends StatefulWidget {
+class HomePage extends StatelessWidget {
   const HomePage({super.key});
 
   @override
-  State<HomePage> createState() => _HomePageState();
-}
-
-class _HomePageState extends State<HomePage> {
-  @override
   Widget build(BuildContext context) {
-    // We don't need to listen here, just access the songs list and methods
-    final musicProvider = Provider.of<MusicProvider>(context, listen: false);
     return Scaffold(
-      backgroundColor: Colors.blue[100],
+      backgroundColor: Colors.grey[50],
       appBar: AppBar(
-        title: const Text("Home"),
-        backgroundColor: Colors.blue[500],
-        centerTitle: true,
-        actions: [
-          IconButton(
-              onPressed: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const ProfilePage()));
-              },
-              icon: const Icon(Icons.person))
-        ],
-      ),
+          title: const Text("Home"),
+          backgroundColor: Colors.blue[500],
+          centerTitle: true,
+          actions: [
+            IconButton(
+                onPressed: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const ProfilePage()));
+                },
+                icon: const Icon(Icons.person))
+          ]),
       drawer: const DrawerPage(),
-      body: ListView.builder(
-        itemCount: musicProvider.songs.length,
-        itemBuilder: (context, index) {
-          final song = musicProvider.songs[index];
-          return ListTile(
-            leading: CircleAvatar(
-              backgroundImage: NetworkImage(song.albumArtUrl),
-            ),
-            title: Text(song.title),
-            subtitle: Text(song.artist),
-            onTap: () async {
-              await musicProvider.playSong(index);
+      body: Consumer<MusicProvider>(
+        builder: (context, musicProvider, child) {
+          if (musicProvider.playlist.isEmpty) {
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          }
+
+          return ListView.builder(
+            padding: const EdgeInsets.all(8),
+            itemCount: musicProvider.playlist.length,
+            itemBuilder: (context, index) {
+              final song = musicProvider.playlist[index];
+              final isCurrentSong = index == musicProvider.currentIndex;
+
+              return Card(
+                margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                child: ListTile(
+                  leading: Container(
+                    width: 50,
+                    height: 50,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(8),
+                      image: DecorationImage(
+                        image: NetworkImage(song.albumArtUrl),
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                    child: isCurrentSong && musicProvider.isPlaying
+                        ? Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(8),
+                              color: Colors.black54,
+                            ),
+                            child: const Icon(
+                              Icons.pause,
+                              color: Colors.white,
+                            ),
+                          )
+                        : null,
+                  ),
+                  title: Text(
+                    song.title,
+                    style: TextStyle(
+                      fontWeight:
+                          isCurrentSong ? FontWeight.bold : FontWeight.normal,
+                      color: isCurrentSong ? Colors.blue : null,
+                    ),
+                  ),
+                  subtitle: Text(song.artist),
+                  trailing: IconButton(
+                    icon: Icon(
+                      isCurrentSong && musicProvider.isPlaying
+                          ? Icons.pause_circle_filled
+                          : Icons.play_circle_filled,
+                      color: Colors.blue,
+                      size: 32,
+                    ),
+                    onPressed: () {
+                      if (isCurrentSong) {
+                        musicProvider.togglePlayPause();
+                      } else {
+                        musicProvider.playAtIndex(index);
+                      }
+                    },
+                  ),
+                  onTap: () {
+                    if (!isCurrentSong) {
+                      musicProvider.playAtIndex(index);
+                    }
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const MusicPlayerScreen(),
+                      ),
+                    );
+                  },
+                ),
+              );
             },
           );
         },
