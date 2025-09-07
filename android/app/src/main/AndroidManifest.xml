@@ -1,4 +1,17 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<!-- For Android 12 and below -->
+<uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" 
+                 android:maxSdkVersion="28" />
+
+<!-- For Android 13+ (API 33+) - Granular media permissions -->
+<uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />
+
+<!-- Internet permission for any network requests (if needed) -->
+<uses-permission android:name="android.permission.INTERNET" />
+
+<!-- Optional: Wake lock to prevent device sleep during playback -->
+<uses-permission android:name="android.permission.WAKE_LOCK" />
     <application
         android:label="musicplaylist"
         android:name="${applicationName}"

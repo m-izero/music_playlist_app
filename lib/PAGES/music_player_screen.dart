@@ -1,5 +1,6 @@
 // import 'package:flutter/material.dart';
 // import 'package:provider/provider.dart';
+// import '../models/song.dart';
 // import '../providers/music_provider.dart';
 
 // class MusicPlayerScreen extends StatefulWidget {
@@ -17,6 +18,53 @@
 //     return Consumer<MusicProvider>(
 //       builder: (context, musicProvider, child) {
 //         final currentSong = musicProvider.currentSong;
+
+//         // ✅ UPDATED: Show file picker when no songs are available
+//         if (musicProvider.playlist.isEmpty) {
+//           return Scaffold(
+//             appBar: AppBar(
+//               title: const Text('Music Player'),
+//             ),
+//             body: Center(
+//               child: Column(
+//                 mainAxisAlignment: MainAxisAlignment.center,
+//                 children: [
+//                   Icon(
+//                     Icons.library_music,
+//                     size: 80,
+//                     color: Colors.grey.shade400,
+//                   ),
+//                   const SizedBox(height: 20),
+//                   Text(
+//                     'No songs in your library',
+//                     style: TextStyle(
+//                       fontSize: 18,
+//                       color: Colors.grey.shade600,
+//                     ),
+//                   ),
+//                   const SizedBox(height: 10),
+//                   Text(
+//                     'Add some music to get started',
+//                     style: TextStyle(
+//                       fontSize: 14,
+//                       color: Colors.grey.shade500,
+//                     ),
+//                   ),
+//                   const SizedBox(height: 30),
+//                   ElevatedButton.icon(
+//                     onPressed: () => musicProvider.pickAudioFiles(),
+//                     icon: const Icon(Icons.add),
+//                     label: const Text('Add Music'),
+//                     style: ElevatedButton.styleFrom(
+//                       padding: const EdgeInsets.symmetric(
+//                           horizontal: 30, vertical: 15),
+//                     ),
+//                   ),
+//                 ],
+//               ),
+//             ),
+//           );
+//         }
 
 //         if (currentSong == null) {
 //           return Scaffold(
@@ -42,7 +90,7 @@
 //               ),
 //               child: Column(
 //                 children: [
-//                   // ✅ Custom App Bar
+//                   // ✅ Custom App Bar with Add Music option
 //                   Padding(
 //                     padding: const EdgeInsets.symmetric(
 //                         horizontal: 16, vertical: 12),
@@ -62,7 +110,8 @@
 //                         ),
 //                         IconButton(
 //                           icon: const Icon(Icons.more_vert),
-//                           onPressed: () => _showOptionsMenu(context),
+//                           onPressed: () =>
+//                               _showOptionsMenu(context, musicProvider),
 //                         ),
 //                       ],
 //                     ),
@@ -70,25 +119,20 @@
 
 //                   const SizedBox(height: 20),
 
-//                   // ✅ Album Art
+//                   // ✅ UPDATED: Album Art with fallback for local files
 //                   SizedBox.square(
 //                     dimension: 280,
 //                     child: ClipRRect(
 //                       borderRadius: BorderRadius.circular(20),
-//                       child: Image.network(
-//                         currentSong.albumArtUrl,
-//                         fit: BoxFit.cover,
-//                         errorBuilder: (context, error, stackTrace) {
-//                           return Container(
-//                             color: Colors.grey.shade300,
-//                             child: const Icon(
-//                               Icons.music_note,
-//                               size: 100,
-//                               color: Colors.grey,
-//                             ),
-//                           );
-//                         },
-//                       ),
+//                       child: currentSong.albumArtUrl != null
+//                           ? Image.network(
+//                               currentSong.albumArtUrl!,
+//                               fit: BoxFit.cover,
+//                               errorBuilder: (context, error, stackTrace) {
+//                                 return _buildDefaultAlbumArt();
+//                               },
+//                             )
+//                           : _buildDefaultAlbumArt(),
 //                     ),
 //                   ),
 
@@ -133,7 +177,7 @@
 
 //                   const Spacer(),
 
-//                   // ✅ Progress Bar + Time
+//                   // ✅ Progress Bar + Time (unchanged)
 //                   StreamBuilder<Duration>(
 //                     stream: musicProvider.positionStream,
 //                     builder: (context, snapshot) {
@@ -192,7 +236,7 @@
 
 //                   const SizedBox(height: 25),
 
-//                   // ✅ Control Buttons
+//                   // ✅ Control Buttons (unchanged)
 //                   Padding(
 //                     padding: const EdgeInsets.symmetric(horizontal: 20),
 //                     child: Row(
@@ -265,7 +309,7 @@
 
 //                   const SizedBox(height: 25),
 
-//                   // ✅ Volume Control (fixed async issue)
+//                   // ✅ Volume Control (unchanged)
 //                   Padding(
 //                     padding: const EdgeInsets.symmetric(horizontal: 40),
 //                     child: Row(
@@ -281,7 +325,7 @@
 //                             child: Slider(
 //                               value: musicProvider.volume,
 //                               onChanged: (newValue) {
-//                                 musicProvider.setVolume(newValue); // FIXED
+//                                 musicProvider.setVolume(newValue);
 //                               },
 //                               activeColor: Colors.blue,
 //                               inactiveColor: Colors.grey.shade300,
@@ -303,6 +347,27 @@
 //     );
 //   }
 
+//   // ✅ NEW: Default album art widget for local files
+//   Widget _buildDefaultAlbumArt() {
+//     return Container(
+//       decoration: BoxDecoration(
+//         gradient: LinearGradient(
+//           begin: Alignment.topLeft,
+//           end: Alignment.bottomRight,
+//           colors: [
+//             Colors.blue.shade200,
+//             Colors.blue.shade400,
+//           ],
+//         ),
+//       ),
+//       child: const Icon(
+//         Icons.music_note,
+//         size: 100,
+//         color: Colors.white,
+//       ),
+//     );
+//   }
+
 //   String _formatDuration(Duration duration) {
 //     String twoDigits(int n) => n.toString().padLeft(2, '0');
 //     String twoDigitMinutes = twoDigits(duration.inMinutes.remainder(60));
@@ -310,7 +375,8 @@
 //     return '$twoDigitMinutes:$twoDigitSeconds';
 //   }
 
-//   void _showOptionsMenu(BuildContext context) {
+//   // ✅ UPDATED: Options menu with local file management
+//   void _showOptionsMenu(BuildContext context, MusicProvider musicProvider) {
 //     showModalBottomSheet(
 //       shape: const RoundedRectangleBorder(
 //         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
@@ -323,19 +389,36 @@
 //             mainAxisSize: MainAxisSize.min,
 //             children: [
 //               ListTile(
-//                 leading: const Icon(Icons.playlist_add),
-//                 title: const Text('Add to Playlist'),
-//                 onTap: () => Navigator.pop(context),
+//                 leading: const Icon(Icons.add),
+//                 title: const Text('Add More Music'),
+//                 onTap: () {
+//                   Navigator.pop(context);
+//                   musicProvider.pickAudioFiles();
+//                 },
 //               ),
 //               ListTile(
-//                 leading: const Icon(Icons.share),
-//                 title: const Text('Share'),
-//                 onTap: () => Navigator.pop(context),
+//                 leading: const Icon(Icons.delete),
+//                 title: const Text('Remove Current Song'),
+//                 onTap: () {
+//                   Navigator.pop(context);
+//                   musicProvider.removeSong(musicProvider.currentIndex);
+//                 },
+//               ),
+//               ListTile(
+//                 leading: const Icon(Icons.clear_all),
+//                 title: const Text('Clear Playlist'),
+//                 onTap: () {
+//                   Navigator.pop(context);
+//                   _showClearPlaylistDialog(context, musicProvider);
+//                 },
 //               ),
 //               ListTile(
 //                 leading: const Icon(Icons.info),
 //                 title: const Text('Song Info'),
-//                 onTap: () => Navigator.pop(context),
+//                 onTap: () {
+//                   Navigator.pop(context);
+//                   _showSongInfo(context, musicProvider.currentSong!);
+//                 },
 //               ),
 //             ],
 //           ),
@@ -343,244 +426,91 @@
 //       },
 //     );
 //   }
+
+//   // ✅ NEW: Clear playlist confirmation dialog
+//   void _showClearPlaylistDialog(
+//       BuildContext context, MusicProvider musicProvider) {
+//     showDialog(
+//       context: context,
+//       builder: (BuildContext context) {
+//         return AlertDialog(
+//           title: const Text('Clear Playlist'),
+//           content: const Text(
+//               'Are you sure you want to remove all songs from your playlist?'),
+//           actions: [
+//             TextButton(
+//               onPressed: () => Navigator.pop(context),
+//               child: const Text('Cancel'),
+//             ),
+//             TextButton(
+//               onPressed: () {
+//                 Navigator.pop(context);
+//                 musicProvider.clearPlaylist();
+//               },
+//               child: const Text('Clear'),
+//             ),
+//           ],
+//         );
+//       },
+//     );
+//   }
+
+//   // ✅ NEW: Show song information dialog
+//   void _showSongInfo(BuildContext context, Song song) {
+//     showDialog(
+//       context: context,
+//       builder: (BuildContext context) {
+//         return AlertDialog(
+//           title: const Text('Song Information'),
+//           content: Column(
+//             mainAxisSize: MainAxisSize.min,
+//             crossAxisAlignment: CrossAxisAlignment.start,
+//             children: [
+//               _buildInfoRow('Title', song.title),
+//               _buildInfoRow('Artist', song.artist),
+//               _buildInfoRow('File Path', song.filePath),
+//               if (song.duration != null)
+//                 _buildInfoRow('Duration', _formatDuration(song.duration!)),
+//             ],
+//           ),
+//           actions: [
+//             TextButton(
+//               onPressed: () => Navigator.pop(context),
+//               child: const Text('Close'),
+//             ),
+//           ],
+//         );
+//       },
+//     );
+//   }
+
+//   // ✅ NEW: Helper widget for info rows
+//   Widget _buildInfoRow(String label, String value) {
+//     return Padding(
+//       padding: const EdgeInsets.symmetric(vertical: 4),
+//       child: Column(
+//         crossAxisAlignment: CrossAxisAlignment.start,
+//         children: [
+//           Text(
+//             label,
+//             style: const TextStyle(
+//               fontWeight: FontWeight.bold,
+//               fontSize: 14,
+//             ),
+//           ),
+//           const SizedBox(height: 2),
+//           Text(
+//             value,
+//             style: TextStyle(
+//               fontSize: 14,
+//               color: Colors.grey.shade700,
+//             ),
+//             maxLines: 2,
+//             overflow: TextOverflow.ellipsis,
+//           ),
+//           const SizedBox(height: 8),
+//         ],
+//       ),
+//     );
+//   }
 // }
-
-import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import '../providers/music_provider.dart';
-
-class MusicPlayerScreen extends StatelessWidget {
-  const MusicPlayerScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Music Test'),
-        backgroundColor: Colors.blue,
-        foregroundColor: Colors.white,
-      ),
-      body: Consumer<MusicProvider>(
-        builder: (context, musicProvider, child) {
-          return Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                // Status Card
-                Card(
-                  color: musicProvider.isPlaying
-                      ? Colors.green.shade50
-                      : Colors.red.shade50,
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Column(
-                      children: [
-                        Icon(
-                          musicProvider.isPlaying
-                              ? Icons.play_circle
-                              : Icons.pause_circle,
-                          size: 48,
-                          color: musicProvider.isPlaying
-                              ? Colors.green
-                              : Colors.red,
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          musicProvider.isPlaying ? 'PLAYING' : 'STOPPED',
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            color: musicProvider.isPlaying
-                                ? Colors.green
-                                : Colors.red,
-                          ),
-                        ),
-                        if (musicProvider.currentSong != null) ...[
-                          const SizedBox(height: 8),
-                          Text(
-                            musicProvider.currentSong!.title,
-                            style: const TextStyle(fontSize: 16),
-                            textAlign: TextAlign.center,
-                          ),
-                          Text(
-                            '${_formatDuration(musicProvider.currentPosition)} / ${_formatDuration(musicProvider.totalDuration)}',
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: Colors.grey.shade600,
-                            ),
-                          ),
-                        ],
-                      ],
-                    ),
-                  ),
-                ),
-
-                const SizedBox(height: 20),
-
-                // Control Buttons
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    ElevatedButton.icon(
-                      onPressed: () => musicProvider.playFirstSong(),
-                      icon: const Icon(Icons.play_arrow),
-                      label: const Text('Play First'),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.green,
-                        foregroundColor: Colors.white,
-                      ),
-                    ),
-                    ElevatedButton.icon(
-                      onPressed: () => musicProvider.togglePlayPause(),
-                      icon: Icon(musicProvider.isPlaying
-                          ? Icons.pause
-                          : Icons.play_arrow),
-                      label: Text(musicProvider.isPlaying ? 'Pause' : 'Play'),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.blue,
-                        foregroundColor: Colors.white,
-                      ),
-                    ),
-                  ],
-                ),
-
-                const SizedBox(height: 20),
-
-                // Playlist
-                Expanded(
-                  child: Card(
-                    child: Column(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.all(16),
-                          color: Colors.blue.shade50,
-                          child: Row(
-                            children: [
-                              const Icon(Icons.playlist_play),
-                              const SizedBox(width: 8),
-                              Text(
-                                'Playlist (${musicProvider.playlist.length} songs)',
-                                style: const TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        Expanded(
-                          child: ListView.builder(
-                            itemCount: musicProvider.playlist.length,
-                            itemBuilder: (context, index) {
-                              final song = musicProvider.playlist[index];
-                              final isCurrentSong =
-                                  index == musicProvider.currentIndex;
-
-                              return ListTile(
-                                leading: CircleAvatar(
-                                  backgroundColor: isCurrentSong
-                                      ? (musicProvider.isPlaying
-                                          ? Colors.green
-                                          : Colors.orange)
-                                      : Colors.grey.shade300,
-                                  child: Icon(
-                                    isCurrentSong
-                                        ? (musicProvider.isPlaying
-                                            ? Icons.volume_up
-                                            : Icons.pause)
-                                        : Icons.music_note,
-                                    color: isCurrentSong
-                                        ? Colors.white
-                                        : Colors.grey.shade600,
-                                  ),
-                                ),
-                                title: Text(
-                                  song.title,
-                                  style: TextStyle(
-                                    fontWeight: isCurrentSong
-                                        ? FontWeight.bold
-                                        : FontWeight.normal,
-                                    color: isCurrentSong ? Colors.blue : null,
-                                  ),
-                                ),
-                                subtitle: Text(song.artist),
-                                trailing: isCurrentSong
-                                    ? Icon(Icons.equalizer, color: Colors.blue)
-                                    : null,
-                                onTap: () {
-                                  print('🎵 User tapped song at index $index');
-                                  musicProvider.playAtIndex(index);
-                                },
-                              );
-                            },
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-
-                // Progress Bar
-                if (musicProvider.totalDuration.inMilliseconds > 0)
-                  Column(
-                    children: [
-                      const SizedBox(height: 16),
-                      StreamBuilder<Duration>(
-                        stream: musicProvider.positionStream,
-                        builder: (context, snapshot) {
-                          final position = snapshot.data ?? Duration.zero;
-                          final duration = musicProvider.totalDuration;
-                          final value = duration.inMilliseconds > 0
-                              ? (position.inMilliseconds /
-                                      duration.inMilliseconds)
-                                  .clamp(0.0, 1.0)
-                              : 0.0;
-
-                          return Column(
-                            children: [
-                              Slider(
-                                value: value,
-                                onChanged: (newValue) {
-                                  final newPosition = Duration(
-                                    milliseconds:
-                                        (newValue * duration.inMilliseconds)
-                                            .round(),
-                                  );
-                                  musicProvider.seek(newPosition);
-                                },
-                                activeColor: Colors.blue,
-                              ),
-                              Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 16),
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text(_formatDuration(position)),
-                                    Text(_formatDuration(duration)),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          );
-                        },
-                      ),
-                    ],
-                  ),
-              ],
-            ),
-          );
-        },
-      ),
-    );
-  }
-
-  String _formatDuration(Duration duration) {
-    String twoDigits(int n) => n.toString().padLeft(2, '0');
-    String twoDigitMinutes = twoDigits(duration.inMinutes.remainder(60));
-    String twoDigitSeconds = twoDigits(duration.inSeconds.remainder(60));
-    return '$twoDigitMinutes:$twoDigitSeconds';
-  }
-}
